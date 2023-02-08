@@ -1,0 +1,36 @@
+
+.container{
+    width : 400px;
+    margin : 0 auto;
+    font-size: 30px;
+    font-family: "Oswald", sans-serif;
+    
+}
+.button-box{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+   
+    height: 400px;
+    
+}
+button{
+    font-size: 30px;
+}
+[value="C"], [value="0"]{
+    grid-column: span 2;
+    
+}
+
+.output{
+
+    font-family: "Play", sans-serif;
+    border: 2px solid black;
+    text-align: right;
+}
+
+.output > div{
+    margin: 0;  
+}
+#operation-total{
+    font-size: 70px;
+}
