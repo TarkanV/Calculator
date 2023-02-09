@@ -52,7 +52,7 @@ function logInputs(cur, total){
 
 let currentInput = "0";
 let totalInput = "0";
-let previousInput = "0";
+let previousInput = null;
 let input;
 let operator;
 let isFirstInput = true;
@@ -68,12 +68,15 @@ while(resume){
             currentInput = input; 
             isFirstInput = false;
         }
+        //fill up the input if no operator has been used just before
         else if(operationState == false) 
             currentInput += input;
+        //Input new number to operate after the first    
         else{
             previousInput = currentInput;
             currentInput = input; 
             operationState = false;
+            console.log("happened" + currentInput);
         }
 
         totalNode.textContent = currentInput;
@@ -82,20 +85,23 @@ while(resume){
     if(input == "q") resume = false;
 
     operationState = true;
-    switch(input){
-        case "+":
-            currentInput = +currentInput + +previousInput;
-            console.log(currentInput); 
-        break;
-        case "=":
-            currentInput = +currentInput + +previousInput;
-            console.log(currentInput);
-            operationState = false;
-            previousInput = 0;
+    
+        if(input == "="){
+            
+            currentInput = operate(+currentInput, +previousInput, operator);
+            console.log("Equals : " + currentInput);
+            //operationState = false;
+            previousInput = null;
+            operator = null;
+        }
+        //If an Operator is the input
+        else{
+            if(previousInput && operator) currentInput = operate(+currentInput, +previousInput, operator);
+            operator = input;
+             console.log(currentInput); 
+        }
 
-        break;
-
-    }
+    
     
     
         
@@ -105,8 +111,14 @@ function checkInputValue(){
 
 }
 
+function operate(a, b, operation){
+    switch(operation){
+        case "+": return b+a;
+        case "-": return b-a;
+        case "*": return b*a;
+        case "\/": 
+        return b/a;
+    }
 
-
-function doAddition(a, b){
-    return a + b;
 }
+
