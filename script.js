@@ -41,8 +41,9 @@ btns = btns.concat(makeButtons(btnBox,1,2,3,"×",4,5,6,"-",7,8,9,"+", ));
 btns = btns.concat(makeButtons(btnBox, 0,".","="));
 
 
-let operators = getBtnFromValue(btns, "+", "-", "×","÷");
+let operators = getBtnFromValue(btns, "+", "-", "×","÷","=");
 let numbers = getBtnFromValue(btns, 1,2,3,4,5,6,7,8,9);
+
 let currentNode = document.querySelector("#operation-str");
 let totalNode = document.querySelector("#operation-total");
 
@@ -60,8 +61,10 @@ let operationState = false;
 
 logInputs(currentInput, totalInput);
 let resume = true;
-while(resume){
-    input = prompt("Input : ", "0");
+
+numbers.forEach( (number) => number.node.addEventListener("click", (e) =>{
+ 
+    input = e.target.value;
     
     if(!isNaN((+input))){ 
         if(isFirstInput) {
@@ -80,12 +83,12 @@ while(resume){
         }
 
         totalNode.textContent = currentInput;
-        continue;
     }
-    if(input == "q") resume = false;
-
-    operationState = true;
-    
+    })  
+   
+);
+/*
+        operationState = true;
         if(input == "="){
             
             currentInput = operate(+currentInput, +previousInput, operator);
@@ -104,8 +107,8 @@ while(resume){
     
     
     
-        
-}
+    */    
+
 
 function checkInputValue(){
 
