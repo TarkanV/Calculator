@@ -1,21 +1,38 @@
+body{
+    background-color: whitesmoke;
+}
 
 .container{
     width : 400px;
     margin : 0 auto;
     font-size: 30px;
     font-family: "Oswald", sans-serif;
+    background-color: gray;
+    padding: 20px;
+    border-radius: 20px;
+    border : 3px solid darkgray;
+    box-shadow: 0 0 3px 3px;
+    
     
 }
 .button-box{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-   
+    padding : 5px;
     height: 400px;
+    gap : 5px;
+ 
     
 }
 button{
     font-size: 30px;
+    border-radius: 100px;   
 }
+
+.key{
+    
+}
+
 [value="C"], [value="0"]{
     grid-column: span 2;
     
@@ -26,6 +43,7 @@ button{
     font-family: "Play", sans-serif;
     border: 2px solid black;
     text-align: right;
+    background-color: white;
 }
 
 .output > div{
@@ -34,3 +52,8 @@ button{
 #operation-total{
     font-size: 70px;
 }
+
+.operators{
+    background-color: lightgrey;
+}
+

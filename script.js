@@ -13,9 +13,9 @@ function Button(parent, value){
       
 }
 
-function addClasses(cls, nodes){
-    for (node of nodes){
-        node.classList.toggle(cls);
+function addClasses(cls, buttons){
+    for (button of buttons){
+        button.node.classList.toggle(cls);
     }
 }
 
@@ -46,6 +46,7 @@ btns = btns.concat(makeButtons(btnBox, 0,".","="));
 
 let numbers = getBtnFromValue(btns, 1,2,3,4,5,6,7,8,9,0,"⌫","C",".");
 let operators = getBtnFromValue(btns, "+", "-", "×","÷","=");
+let test = addClasses("operators", operators);
 
 let currentNode = document.querySelector("#operation-str");
 let totalNode = document.querySelector("#operation-total");
