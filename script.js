@@ -64,132 +64,149 @@ let backspaceState = false;
 
 let resume = true;
 
-numbers.forEach( (number) => number.node.addEventListener("click", (e) =>{
- 
-    input = e.target.value;
-
-    //Checking numbers, C and backspace inputs 
-    if(!isNaN((+input))){ 
-        if(isFirstInput) {
-            currentInput = input; 
-            isFirstInput = false;
-            previousInput = 0;
-            firstNbr = false;
-        }
-        //fill up the input if no operator has been used just before
-        else if(!firstNbr && currentInput !== "0" && currentInput.length < 9) {
-           
-            currentInput += input;
-            
-        }
-        //Input new number to operate after the first    
-        else if (currentInput.length != 9 || operationState){
-            if(!backspaceState) previousInput = currentInput;
-            else backspaceState = false;
-            currentInput = input; 
-            operationState = false;
-            firstNbr = false;
-            
-        }
-    
+function evalNumbers(input){
+    if(isFirstInput) {
+        currentInput = input; 
+        isFirstInput = false;
+        previousInput = 0;
+        firstNbr = false;
     }
-    else if(input == "⌫"){
-        if(previousInput == null || firstNbr){
-
-        }
-        else if(currentInput.length != 1)
-            currentInput = currentInput.slice(0, currentInput.length-1);
-        else {
-            currentInput = "0";
-            backspaceState = true;
-            
-        }
+    //fill up the input if no operator has been used just before
+    else if(!firstNbr && currentInput !== "0" && currentInput.length < 9) {
+       
+        currentInput += input;
+        
     }
-    else if(input == "C"){
+    //Input new number to operate after the first    
+    else if (currentInput.length != 9 || operationState){
+        if(!backspaceState) previousInput = currentInput;
+        else backspaceState = false;
+        currentInput = input; 
+        operationState = false;
+        firstNbr = false;
+        
+    }
+}
+
+function evalBackspace(){
+    if(previousInput == null || firstNbr){
+
+    }
+    else if(currentInput.length != 1)
+        currentInput = currentInput.slice(0, currentInput.length-1);
+    else {
         currentInput = "0";
+        backspaceState = true;
+        
+    }
+}
+
+function evalClear(){
+    currentInput = "0";
 
         isFirstInput = true;
         previousInput = null;
         operator = null;
         operationState = false;
         currentNode.textContent = "0";
+}
+
+function evalFraction(){
+    if(!currentInput.includes(".")){
+        currentInput += ".";
+        firstNbr = false;
+        isFirstInput = false;
         
     }
-    else if(input == "."){
-        if(!currentInput.includes(".")){
-            currentInput += ".";
-            firstNbr = false;
-            isFirstInput = false;
-            
-        }
-    }
+}
+
+numbers.forEach((number) => number.node.addEventListener("click", (e) =>{
+ 
+    input = e.target.value;
+    //Checking numbers, C and backspace inputs 
+    if(!isNaN((+input))) evalNumbers(input);      
+    else if(input == "⌫") evalBackspace();
+    else if(input == "C") evalClear(); 
+    else if(input == ".") evalFraction();
 
     totalNode.textContent = currentInput;
     })  
    
 );
-//Listening to operator inputs
-operators.forEach(oprt => oprt.node.addEventListener("click", (e) => {
-    
-    input = e.target.value;
-    
-    if(input == "="){
-        if(!operator){
-            
-        }
-        else if(operationState == false && previousInput !== null ){
-            
-            currentNode.textContent = `${previousInput} ${operator} ${currentInput} = `;
-            currentInput = operate(+previousInput, +currentInput, operator);
 
-            //Checks if input is too big
-            
-            if(currentInput == Infinity){
-                totalNode.textContent = "0 DIVISION";
-                currentInput = 0;
-            }
-            else if(currentInput > 999999999){
-                totalNode.textContent = "TOO LONG";
-                currentInput = 0;
-            }
+let body = document.querySelector("body");
 
-            else{
-                currentInput = currentInput.toString(); 
-                while(currentInput.length >= 10)
-                    currentInput = currentInput.slice(0, currentInput.length-1);
-                currentInput = +currentInput;
-                //currentNode.textContent += currentInput;
-                totalNode.textContent = currentInput;
-            }
-            
-            
-            //operationState = false;
-            previousInput = null;
-            operator = null;
-            operationState = true;
-            firstNbr = true;
-        }
+body.addEventListener("keydown", (e) => {
+    let key = e.key.toLowerCase();
+    console.log(key);
+    
+    if(/[0-9]/.test(key)) {
+        if(key.length == 1)
+            evalNumbers(key);
+    }      
+    else if(key == "backspace") evalBackspace();
+    else if(key == "c") evalClear(); 
+    else if(key == ".") evalFraction();
+
+    if(key == "=" || key == "enter") evalEqual(key);    
+    else if(/[\+\-\*\/]/.test(key)) evalOperators(key); 
+
+    totalNode.textContent = currentInput;
+    
+});
+
+function checkErrors(){
+    if(currentInput == Infinity){
+        totalNode.textContent = "0 DIVISION";
+        currentInput = 0;
+        return true; 
     }
-    //If an Operator is the input
-    else{
+    else if(currentInput > 999999999){
+        totalNode.textContent = "TOO LONG";
+        currentInput = 0;
+        return true;
+    }
+}
+
+function evalEqual(input){
+    if(!operator){
+            
+    }
+    else if(operationState == false && previousInput !== null ){
+        
+        currentNode.textContent = `${previousInput} ${operator} ${currentInput} = `;
+        currentInput = operate(+previousInput, +currentInput, operator);
+
+        //Checks if input is too big
+        
+        if(checkErrors()) {}
+        else{
+            currentInput = currentInput.toString(); 
+            while(currentInput.length >= 10)
+                currentInput = currentInput.slice(0, currentInput.length-1);
+            currentInput = +currentInput;
+            totalNode.textContent = currentInput;
+        }
+        previousInput = null;
+        operator = null;
         operationState = true;
+        firstNbr = true;
+    }
+}
+
+function evalOperators(input){
+    operationState = true;
         firstNbr = true;
          if(previousInput !== null && operator) {
             currentInput = operate(+previousInput, +currentInput, operator);
             previousInput = null;    
         }
 
-        operator = input;
+        
+        operator = (input == "*") ? "×" : (input == "\/") ? "÷" : input;
         
 
-        if(currentInput == Infinity){
-            totalNode.textContent = "DIVISION BY 0";
-            currentInput = 0;
-        }
-        else if(currentInput > 999999999){
-            totalNode.textContent = "TOO LONG";
-            currentInput = 0;
-        }
+        if(checkErrors()){}
         
         else {   
             currentInput = currentInput.toString(); 
@@ -200,9 +217,13 @@ operators.forEach(oprt => oprt.node.addEventListener("click", (e) => {
             currentNode.textContent = `${currentInput} ${operator}`;
         }
         if(isFirstInput) isFirstInput = false;
-    }
+}
 
-    
+operators.forEach(oprt => oprt.node.addEventListener("click", (e) => { 
+
+    input = e.target.value;  
+    if(input == "=") evalEqual(input);    
+    else if(/[\+\-\×\÷]/.test(input)) evalOperators(input);  
 })
 );   
     
@@ -217,8 +238,11 @@ function operate(a, b, operation){
     switch(operation){
         case "+": return a+b;
         case "-": return a-b;
-        case "×": return a*b;
-        case "÷": 
+        case "×":
+        case "*":
+            return a*b;
+        case "÷":
+        case "\/":
         return a/b;
     }
 
