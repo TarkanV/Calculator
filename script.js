@@ -1,6 +1,6 @@
 
 let btnBox = document.querySelector(".button-box");
-console.log(btnBox);
+
 
 function Button(parent, value){
     this.value = value;
@@ -36,78 +36,177 @@ function getBtnFromValue(buttons, ...values){
  }
 
 
+
+
 let btns = makeButtons(btnBox,"C","⌫","÷"); 
 btns = btns.concat(makeButtons(btnBox,1,2,3,"×",4,5,6,"-",7,8,9,"+", ));
 btns = btns.concat(makeButtons(btnBox, 0,".","="));
 
 
+
+let numbers = getBtnFromValue(btns, 1,2,3,4,5,6,7,8,9,0,"⌫","C",".");
 let operators = getBtnFromValue(btns, "+", "-", "×","÷","=");
-let numbers = getBtnFromValue(btns, 1,2,3,4,5,6,7,8,9);
 
 let currentNode = document.querySelector("#operation-str");
 let totalNode = document.querySelector("#operation-total");
 
-function logInputs(cur, total){
-    console.log(cur, total);
-}
-
 let currentInput = "0";
 let totalInput = "0";
+
 let previousInput = null;
 let input;
 let operator;
 let isFirstInput = true;
 let operationState = false;
+let firstNbr = true;
+let backspaceState = false;
 
-logInputs(currentInput, totalInput);
+
 let resume = true;
 
 numbers.forEach( (number) => number.node.addEventListener("click", (e) =>{
  
     input = e.target.value;
-    
+
+    //Checking numbers, C and backspace inputs 
     if(!isNaN((+input))){ 
         if(isFirstInput) {
             currentInput = input; 
             isFirstInput = false;
+            previousInput = 0;
+            firstNbr = false;
         }
         //fill up the input if no operator has been used just before
-        else if(operationState == false) 
+        else if(!firstNbr && currentInput !== "0" && currentInput.length < 9) {
+           
             currentInput += input;
+            
+        }
         //Input new number to operate after the first    
-        else{
-            previousInput = currentInput;
+        else if (currentInput.length != 9 || operationState){
+            if(!backspaceState) previousInput = currentInput;
+            else backspaceState = false;
             currentInput = input; 
             operationState = false;
-            console.log("happened" + currentInput);
+            firstNbr = false;
+            
         }
-
-        totalNode.textContent = currentInput;
+    
     }
+    else if(input == "⌫"){
+        if(previousInput == null || firstNbr){
+
+        }
+        else if(currentInput.length != 1)
+            currentInput = currentInput.slice(0, currentInput.length-1);
+        else {
+            currentInput = "0";
+            backspaceState = true;
+            
+        }
+    }
+    else if(input == "C"){
+        currentInput = "0";
+
+        isFirstInput = true;
+        previousInput = null;
+        operator = null;
+        operationState = false;
+        currentNode.textContent = "0";
+        
+    }
+    else if(input == "."){
+        if(!currentInput.includes(".")){
+            currentInput += ".";
+            firstNbr = false;
+            isFirstInput = false;
+            
+        }
+    }
+
+    totalNode.textContent = currentInput;
     })  
    
 );
-/*
-        operationState = true;
-        if(input == "="){
+//Listening to operator inputs
+operators.forEach(oprt => oprt.node.addEventListener("click", (e) => {
+    
+    input = e.target.value;
+    
+    if(input == "="){
+        if(!operator){
             
-            currentInput = operate(+currentInput, +previousInput, operator);
-            console.log("Equals : " + currentInput);
+        }
+        else if(operationState == false && previousInput !== null ){
+            
+            currentNode.textContent = `${previousInput} ${operator} ${currentInput} = `;
+            currentInput = operate(+previousInput, +currentInput, operator);
+
+            //Checks if input is too big
+            
+            if(currentInput == Infinity){
+                totalNode.textContent = "0 DIVISION";
+                currentInput = 0;
+            }
+            else if(currentInput > 999999999){
+                totalNode.textContent = "TOO LONG";
+                currentInput = 0;
+            }
+
+            else{
+                currentInput = currentInput.toString(); 
+                while(currentInput.length >= 10)
+                    currentInput = currentInput.slice(0, currentInput.length-1);
+                currentInput = +currentInput;
+                //currentNode.textContent += currentInput;
+                totalNode.textContent = currentInput;
+            }
+            
+            
             //operationState = false;
             previousInput = null;
             operator = null;
+            operationState = true;
+            firstNbr = true;
         }
-        //If an Operator is the input
-        else{
-            if(previousInput && operator) currentInput = operate(+currentInput, +previousInput, operator);
-            operator = input;
-             console.log(currentInput); 
+    }
+    //If an Operator is the input
+    else{
+        operationState = true;
+        firstNbr = true;
+         if(previousInput !== null && operator) {
+            currentInput = operate(+previousInput, +currentInput, operator);
+            previousInput = null;    
         }
 
+        operator = input;
+        
+
+        if(currentInput == Infinity){
+            totalNode.textContent = "DIVISION BY 0";
+            currentInput = 0;
+        }
+        else if(currentInput > 999999999){
+            totalNode.textContent = "TOO LONG";
+            currentInput = 0;
+        }
+        
+        else {   
+            currentInput = currentInput.toString(); 
+            while(currentInput.length >= 10)
+                    currentInput = currentInput.slice(0, currentInput.length-1);
+            currentInput = +currentInput;
+            totalNode.textContent = currentInput;
+            currentNode.textContent = `${currentInput} ${operator}`;
+        }
+        if(isFirstInput) isFirstInput = false;
+    }
+
     
+})
+);   
     
-    
-    */    
+ 
 
 
 function checkInputValue(){
@@ -116,12 +215,11 @@ function checkInputValue(){
 
 function operate(a, b, operation){
     switch(operation){
-        case "+": return b+a;
-        case "-": return b-a;
-        case "*": return b*a;
-        case "\/": 
-        return b/a;
+        case "+": return a+b;
+        case "-": return a-b;
+        case "×": return a*b;
+        case "÷": 
+        return a/b;
     }
 
 }
-
