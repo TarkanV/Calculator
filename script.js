@@ -139,7 +139,6 @@ let body = document.querySelector("body");
 
 body.addEventListener("keydown", (e) => {
     let key = e.key.toLowerCase();
-    console.log(key);
     
     if(/[0-9]/.test(key)) {
         if(key.length == 1)
